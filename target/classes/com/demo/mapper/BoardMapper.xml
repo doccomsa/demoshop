@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.demo.mapper.BoardMapper">
+
+	<select id="getList" resultType="com.demo.domain.BoardVO">
+		<!-- select * from tbl_board where bno > 0 -->
+		select bno, title, content, writer, regdate, updatedate from tbl_board order by bno desc
+	</select>
+	
+	<!--  재사용목적 -->
+	<!-- foreach 참조 https://java119.tistory.com/85 -->
+	<!--  검색조건 : 제목, 내용, 작성자 경우의 수 6가지 -->
+	<!-- getTypeArr() 예> 제목+작성자 선택시  {"T", "W" } -->
+	<sql id="criteria">
+		
+		<trim prefix="(" suffix=") AND " prefixOverrides="OR">
+			<foreach collection="typeArr" item="type">
+			  <trim prefix="OR">
+			  	<choose>
+			  		<when test="type == 'T'.toString()">
+			  			title like '%' || #{keyword} || '%'
+			  		</when>
+			  		<when test="type == 'C'.toString()">
+			  			content like '%' || #{keyword} || '%'
+			  		</when>
+			  		<when test="type == 'W'.toString()">
+			  			writer like '%' || #{keyword} || '%'
+			  		</when>
+			  	</choose>
+			  </trim>
+			</foreach>
+		</trim>
+	
+	</sql>
+	
+	<select id="getListWithPaging" resultType="com.demo.domain.BoardVO">
+		<![CDATA[  
+		select rn, bno, title, content, writer, regdate, updatedate
+		from (
+	        SELECT /*+ INDEX_DESC(TBL_BOARD PK_BOARD) */  ROWNUM RN, bno, title, content, writer, regdate, updatedate
+	        FROM TBL_BOARD
+	       	WHERE 
+	    ]]>   	
+	       	<include refid="criteria" />  
+	    <![CDATA[    	
+	       	ROWNUM <= #{pageNum} * #{amount}
+ 			)
+		WHERE RN > (#{pageNum}-1) * #{amount}
+		]]>
+	</select>
+	
+	<select id="getTotalCount" resultType="int">
+	
+		select count(*) from tbl_board where
+		
+		<include refid="criteria" /> 
+		
+		bno > 0
+	</select>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<select id="get" resultType="com.demo.domain.BoardVO" parameterType="long">
+		select bno, title, content, writer, regdate, updatedate from tbl_board where bno = #{bno}
+	</select>
+	
+	
+	<insert id="insert" parameterType="com.demo.domain.BoardVO">
+		insert into tbl_board(bno, title, content, writer)
+		values(seq_board.nextval, #{title}, #{content}, #{writer})
+	</insert>
+	 
+	<!--  
+	<insert id="insert" parameterType="com.demo.domain.BoardVO">
+		
+		<selectKey order="BEFORE" resultType="long" keyProperty="bno">
+			select seq_board.nextval from dual
+		</selectKey>
+		
+		insert into tbl_board(bno, title, content, writer)
+		values(#{bno}, #{title}, #{content}, #{writer})
+		
+	</insert>
+	 -->
+	<update id="modify" parameterType="com.demo.domain.BoardVO">
+	
+		update tbl_board
+			set title = #{title}, content = #{content}
+		where bno = #{bno}
+	
+	</update> 
+	
+	<delete id="remove" parameterType="long">
+	
+		delete from tbl_board where bno = #{bno}
+	
+	</delete>
+	 
+	 
+</mapper>

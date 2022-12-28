@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.demo.mapper.ReplyMapper">
+
+	<select id="getListWithPaging" resultType="com.demo.domain.ReplyVO">
+	
+	<![CDATA[ 
+		SELECT RN, rno, BNO, REPLY, REPLYER, REPLYDATE, UPDATEDATE
+FROM (
+    SELECT /*+ INDEX_DESC(TBL_REPLY PK_REPLY) */ ROWNUM RN, rno, BNO, REPLY, REPLYER, REPLYDATE, UPDATEDATE FROM TBL_REPLY
+    WHERE BNO = #{bno} AND rownum <= #{cri.pageNum} * #{cri.amount}
+)
+where rn > (#{cri.pageNum} -1) * #{cri.amount}
+	]]>
+	
+	</select>
+	
+	
+	<select id="getCountByBno" resultType="int">
+		SELECT count(*) FROM TBL_REPLY WHERE BNO = #{bno}
+	</select>
+	
+	<!-- resultType속성은 지원이 안되지만, insert문이 동작이되어, 테이블에 저장된 행수를 리턴한다.  -->
+	<insert id="insert">
+		insert into tbl_reply(rno, bno, reply, replyer)
+		values(seq_reply.nextval, #{bno}, #{reply}, #{replyer})
+	</insert>
+	
+	<update id="modify">
+	
+		update tbl_reply
+			set reply = #{reply}, updatedate = sysdate
+		where rno = #{rno}
+	
+	</update>
+	
+	<delete id="delete">
+	
+		delete from tbl_reply where rno = #{rno}
+	
+	</delete>
+
+</mapper>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+ <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+</head>
+<body>
+<div class="box-body">
+      <div class="form-group row">
+        <label for="replyer" class="col-3 col-form-label">작성자</label>
+        <div class="col-5">
+          <input type="text" name="rno"readonly>
+          <input type="text" class="form-control" name="replyer" readonly>
+        </div>
+        <label for="reply" class="col-4 col-form-label">등록일: </label>
+      </div>
+      <div class="form-group row">
+        <div class="col-8">
+          <textarea class="form-control" name="reply" rows="3" readonly></textarea>
+        </div>
+        <div class="col-4">
+          <input type="button" name="btnModalModify" value="수정"><br>
+          <input type="button" name="btnModalDelete" value="삭제">
+        </div>
+      </div>
+  </div>
+    <hr>
+</body>
+</html>
